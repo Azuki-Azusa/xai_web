@@ -106,12 +106,12 @@
       },
       methods: {
         createSession() {
-          this.selectedSessionId = 0;
           this.sessions.push({
             id: this.sessions.length,
             name: "Session " + (this.sessions.length + 1),
             messages: []
           });
+          this.selectedSessionId = this.sessions.length - 1;
         },
         selectSession() {
           // This will trigger Vue to update the selectedSession computed property
@@ -121,6 +121,9 @@
           confirm("确定要清空会话吗？") && (this.sessions = []);
         },
         sendMessage() {
+          if (this.selectedSessionId == null) {
+            this.createSession();
+          }
           if (this.newMessage.trim() && this.selectedSession) {
             this.selectedSession.messages.push({ role: "user", content: this.newMessage });
             axios.post("/fsdufyaowuihfioufiuosahuivhasdiuvisauvhiuh4iuhvvisuhasioduhviusahvioash", {

@@ -10,7 +10,7 @@ client = OpenAI(
     base_url="https://api.x.ai/v1",
 )
 
-def chat(messages: list[dict]):
+def chat(messages):
     if len(messages) > 10:
         messages = messages[-10:]
     else:

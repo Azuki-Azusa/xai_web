@@ -14,4 +14,4 @@ def xai_route():
     return chat(messages)
 
 if __name__ == "__main__":
-    app.run(port=19981)
+    app.run(host="0.0.0.0", port=19981)

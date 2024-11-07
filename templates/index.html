@@ -132,9 +132,9 @@
               messages: this.selectedSession.messages
             }).then(response => {
               this.selectedSession.messages.push({ role: "system", content: response.data });
+              localStorage.setItem("sessions", JSON.stringify(this.sessions));
             });
             this.newMessage = "";  // Clear the input after sending
-            localStorage.setItem("sessions", JSON.stringify(this.sessions));
           }
         },
         markdownToHtml(content) {

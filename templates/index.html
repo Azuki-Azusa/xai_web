@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatGPT-like App</title>
+
+  <!-- Vuetify CSS from CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/vuetify@2.5.10/dist/vuetify.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Google Material Icons for Vuetify -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Icons"
+    rel="stylesheet"
+  />
+</head>
+<body>
+
+  <div id="app">
+    <v-app>
+      <v-container fluid>
+        <v-row>
+          <!-- Sidebar for session selection -->
+          <v-col cols="3">
+            <v-navigation-drawer app>
+              <v-list>
+                <v-list-item-group v-model="selectedSessionId" @change="selectSession">
+                  <v-list-item
+                    v-for="session in sessions"
+                    :key="session.id"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title>{{ session.name }}</v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
+                <v-btn @click="createSession" color="primary" block>创建会话</v-btn>
+                <v-btn @click="clearSession()" color="error" block>清空会话</v-btn>
+              </v-list>
+            </v-navigation-drawer>
+          </v-col>
+
+          <!-- Content area for the selected session's messages -->
+          <v-col cols="9">
+            <v-card>
+              <v-card-title>
+                <span>Session Content</span>
+              </v-card-title>
+              <v-divider></v-divider>
+              <v-card-text>
+                <div v-if="selectedSession && selectedSession.messages.length">
+                  <div
+                    v-for="(message, index) in selectedSession.messages"
+                    :key="index"
+                    :class="['message', message.role]"
+                  >
+                    {{ message.content }}
+                  </div>
+                </div>
+                <div v-else>No messages in this session.</div>
+              </v-card-text>
+              <v-divider></v-divider>
+
+              <!-- Input box and send button -->
+              <v-card-actions>
+                <v-textarea
+                  v-model="newMessage"
+                  label="Type a message"
+                  outlined
+                  dense
+                  hide-details
+                  class="flex-grow-1"
+                  @keyup.enter="sendMessage"
+                ></v-textarea>
+                <v-btn color="primary" @click="sendMessage">Send</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-app>
+  </div>
+
+  <!-- Vue and Vuetify JS from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.5.10/dist/vuetify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.7.2/dist/axios.min.js"></script>
+
+  <!-- App Script -->
+  <script>
+    new Vue({
+      el: "#app",
+      vuetify: new Vuetify(),
+      data: {
+        sessions: [],
+        selectedSessionId: null,
+        newMessage: ""
+      },
+      computed: {
+        selectedSession() {
+          return this.sessions.find(session => session.id === this.selectedSessionId);
+        }
+      },
+      methods: {
+        createSession() {
+          this.selectedSessionId = 0;
+          this.sessions.push({
+            id: this.sessions.length,
+            name: "Session " + (this.sessions.length + 1),
+            messages: []
+          });
+        },
+        selectSession() {
+          // This will trigger Vue to update the selectedSession computed property
+          console.log(this.selectedSession);
+        },
+        clearSession() {
+          confirm("确定要清空会话吗？") && (this.sessions = []);
+        },
+        sendMessage() {
+          if (this.newMessage.trim() && this.selectedSession) {
+            this.selectedSession.messages.push({ role: "user", content: this.newMessage });
+            axios.post("/fsdufyaowuihfioufiuosahuivhasdiuvisauvhiuh4iuhvvisuhasioduhviusahvioash", {
+              messages: this.selectedSession.messages
+            }).then(response => {
+              this.selectedSession.messages.push({ role: "system", content: response.data });
+            });
+            this.newMessage = "";  // Clear the input after sending
+            localStorage.setItem("sessions", JSON.stringify(this.sessions));
+          }
+        }
+      },
+      created() {
+        this.sessions = JSON.parse(localStorage.getItem("sessions") || "[]");
+      }
+    });
+  </script>
+
+  <style>
+    .message {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 4px;
+      max-width: 60%;
+      word-wrap: break-word;
+    }
+
+    .user {
+      margin-left: auto;
+      background-color: #d0f0c0;
+      text-align: right;
+    }
+
+    .system {
+      margin-right: auto;
+      background-color: #f0d0d0;
+      text-align: left;
+    }
+
+    .flex-grow-1 {
+      flex-grow: 1;
+    }
+  </style>
+</body>
+</html>
